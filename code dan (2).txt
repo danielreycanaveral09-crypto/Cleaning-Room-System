@@ -1,0 +1,239 @@
+users = {}
+attendance = {}
+
+tasks = [
+    "Sweep the floor",
+    "Mop the floor",
+    "Empty the trash",
+    "Clean the windows",
+    "Arrange cleaning materials"
+]
+
+inventory = {
+    1: {"name": "Broom", "price": 80, "stock": 10},
+    2: {"name": "Mop", "price": 120, "stock": 5},
+    3: {"name": "Detergent", "price": 50, "stock": 15},
+    4: {"name": "Garbage Bags", "price": 30, "stock": 20},
+    5: {"name": "Cleaning Cloth", "price": 25, "stock": 12}
+}
+
+cart = {}
+
+
+def create_account():
+    print("\n=== CREATE ACCOUNT ===")
+    username = input("Username: ")
+    password = input("Password: ")
+
+    if username in users:
+        print("Username already exists.")
+    else:
+        users[username] = password
+        print("Account created successfully!")
+
+
+def login():
+    print("\n=== LOGIN ===")
+    username = input("Username: ")
+    password = input("Password: ")
+
+    if username in users and users[username] == password:
+        print("Login successful!")
+        return username
+
+    print("Invalid username or password.")
+    return None
+
+
+def view_tasks():
+    print("\n=== CLEANING TASKS ===")
+    for i, task in enumerate(tasks, 1):
+        print(str(i) + ". " + task)
+
+
+def mark_attendance(username):
+    print("\n1. Present")
+    print("2. Absent")
+    choice = input("Choose attendance: ")
+
+    if choice == "1":
+        attendance[username] = "Present"
+        print("Marked Present.")
+    elif choice == "2":
+        attendance[username] = "Absent"
+        print("Marked Absent.")
+    else:
+        print("Invalid choice.")
+
+
+def view_attendance():
+    print("\n=== ATTENDANCE RECORDS ===")
+
+    if not attendance:
+        print("No records yet.")
+    else:
+        for username, status in attendance.items():
+            print(username + ": " + status)
+
+
+def view_inventory():
+    print("\n=== INVENTORY ===")
+
+    for number, item in inventory.items():
+        print(
+            str(number) + ". " + item["name"]
+            + " | Price: PHP " + str(item["price"])
+            + " | Stock: " + str(item["stock"])
+        )
+
+
+def select_item():
+    view_inventory()
+
+    try:
+        number = int(input("Enter item number: "))
+
+        if number not in inventory:
+            print("Invalid item number.")
+            return
+
+        quantity = int(input("Enter quantity: "))
+
+        if quantity <= 0:
+            print("Quantity must be greater than zero.")
+            return
+
+        item = inventory[number]
+
+        if quantity > item["stock"]:
+            print("Not enough stock.")
+            return
+
+        item["stock"] -= quantity
+        cart[number] = cart.get(number, 0) + quantity
+
+        total = item["price"] * quantity
+        print("Item added successfully!")
+        print("Subtotal: PHP " + str(total))
+
+    except ValueError:
+        print("Please enter a valid number.")
+
+
+def view_cart():
+    print("\n=== CART ===")
+    total = 0
+
+    if not cart:
+        print("Cart is empty.")
+        return
+
+    for number, quantity in cart.items():
+        item = inventory[number]
+        subtotal = item["price"] * quantity
+        total += subtotal
+
+        print(
+            item["name"] + " x " + str(quantity)
+            + " = PHP " + str(subtotal)
+        )
+
+    print("TOTAL: PHP " + str(total))
+
+
+def add_stock():
+    view_inventory()
+
+    try:
+        number = int(input("Enter item number: "))
+
+        if number not in inventory:
+            print("Invalid item number.")
+            return
+
+        quantity = int(input("Quantity to add: "))
+
+        if quantity <= 0:
+            print("Quantity must be greater than zero.")
+            return
+
+        inventory[number]["stock"] += quantity
+        print("Stock updated successfully!")
+
+    except ValueError:
+        print("Please enter a valid number.")
+
+
+def inventory_menu():
+    while True:
+        print("\n=== INVENTORY MANAGEMENT ===")
+        print("1. View Inventory")
+        print("2. Select Item")
+        print("3. View Cart")
+        print("4. Add Stock")
+        print("5. Back")
+
+        choice = input("Choose: ")
+
+        if choice == "1":
+            view_inventory()
+        elif choice == "2":
+            select_item()
+        elif choice == "3":
+            view_cart()
+        elif choice == "4":
+            add_stock()
+        elif choice == "5":
+            break
+        else:
+            print("Invalid choice.")
+
+
+def main():
+    while True:
+        print("\n=== CLEANING ROOM ATTENDANCE SYSTEM ===")
+        print("1. Create Account")
+        print("2. Login")
+        print("3. Exit")
+
+        choice = input("Choose: ")
+
+        if choice == "1":
+            create_account()
+
+        elif choice == "2":
+            username = login()
+
+            if username is not None:
+                while True:
+                    print("\n=== MAIN MENU ===")
+                    print("1. View Cleaning Tasks")
+                    print("2. Mark Attendance")
+                    print("3. View Attendance")
+                    print("4. Inventory Management")
+                    print("5. Logout")
+
+                    option = input("Choose: ")
+
+                    if option == "1":
+                        view_tasks()
+                    elif option == "2":
+                        mark_attendance(username)
+                    elif option == "3":
+                        view_attendance()
+                    elif option == "4":
+                        inventory_menu()
+                    elif option == "5":
+                        break
+                    else:
+                        print("Invalid choice.")
+
+        elif choice == "3":
+            print("Thank you for using the system!")
+            break
+
+        else:
+            print("Invalid choice.")
+
+
+main()
